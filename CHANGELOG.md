@@ -4,12 +4,16 @@
 
 ## Important Notes
 
+- [#967](https://github.com/oauth2-proxy/oauth2-proxy/pull/967) `--insecure-oidc-skip-nonce` is currently `true` by default in case
+  any existing OIDC Identity Providers don't support it. The default will switch to `false` in a future version.
+
 ## Breaking Changes
 
 ## Changes since v7.0.1
 
 - [#1064](https://github.com/oauth2-proxy/oauth2-proxy/pull/1064) Add support for setting groups on session when using basic auth (@stefansedich)
 - [#1056](https://github.com/oauth2-proxy/oauth2-proxy/pull/1056) Add option for custom logos on the sign in page (@JoelSpeed)
+- [#967](https://github.com/oauth2-proxy/oauth2-proxy/pull/967) Set & verify a nonce with OIDC providers (@NickMeves)
 - [#1054](https://github.com/oauth2-proxy/oauth2-proxy/pull/1054) Update to Go 1.16 (@JoelSpeed)
 - [#1052](https://github.com/oauth2-proxy/oauth2-proxy/pull/1052) Update golangci-lint to latest version (v1.36.0) (@JoelSpeed)
 - [#1043](https://github.com/oauth2-proxy/oauth2-proxy/pull/1043) Refactor Sign In Page rendering and capture all page rendering code in pagewriter package (@JoelSpeed)
