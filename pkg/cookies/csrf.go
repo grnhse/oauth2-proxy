@@ -12,8 +12,6 @@ import (
 	"github.com/vmihailenco/msgpack/v4"
 )
 
-var now = time.Now
-
 // CSRF manages various nonces stored in the CSRF cookie during the initial
 // authentication flows.
 type CSRF interface {
@@ -40,6 +38,7 @@ type csrf struct {
 	OIDCNonce []byte `msgpack:"n,omitempty"`
 
 	cookieOpts *options.Cookie
+	nowFunc    func() time.Time
 }
 
 // NewCSRF creates a CSRF with random nonces
@@ -110,7 +109,7 @@ func (c csrf) SetCookie(rw http.ResponseWriter, req *http.Request) (*http.Cookie
 		encoded,
 		c.cookieOpts,
 		c.cookieOpts.Expire,
-		now(),
+		c.now(),
 	)
 	http.SetCookie(rw, cookie)
 
@@ -125,7 +124,7 @@ func (c csrf) ClearCookie(rw http.ResponseWriter, req *http.Request) {
 		"",
 		c.cookieOpts,
 		time.Hour*-1,
-		now(),
+		c.now(),
 	))
 }
 
@@ -142,7 +141,7 @@ func (c csrf) encodeCookie() (string, error) {
 		return "", err
 	}
 
-	return encryption.SignedValue(c.cookieOpts.Secret, c.cookieName(), encrypted, now())
+	return encryption.SignedValue(c.cookieOpts.Secret, c.cookieName(), encrypted, c.now())
 }
 
 // decodeCSRFCookie validates the signature then decrypts and decodes a CSRF
@@ -172,6 +171,13 @@ func decodeCSRFCookie(cookie *http.Cookie, opts *options.Cookie) (*csrf, error) 
 // session cookie name
 func (c csrf) cookieName() string {
 	return csrfCookieName(c.cookieOpts)
+}
+
+func (c csrf) now() time.Time {
+	if c.nowFunc != nil {
+		return c.nowFunc()
+	}
+	return time.Now()
 }
 
 func csrfCookieName(opts *options.Cookie) string {
